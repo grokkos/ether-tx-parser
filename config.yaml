@@ -1,0 +1,8 @@
+server:
+  port: 8080
+  host: "0.0.0.0"
+
+ethereum:
+  rpc_url: "https://ethereum-rpc.publicnode.com"
+  retry_attempts: 3
+  retry_delay: "2s"
