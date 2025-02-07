@@ -51,22 +51,24 @@ type Block struct {
 // ParseBlocks processes new blocks from the Ethereum blockchain.
 // It starts from the last processed block and continues to the latest block.
 func (s *Service) ParseBlocks() error {
-	// Get the latest block number from Ethereum
 	response, err := s.client.MakeRPCCall("eth_blockNumber", []interface{}{})
 	if err != nil {
 		return fmt.Errorf("failed to get latest block: %v", err)
 	}
 
+	blockNumberStr, ok := response.Result.(string)
+	if !ok {
+		return fmt.Errorf("invalid block number format")
+	}
+
 	var latestBlock int
-	fmt.Sscanf(response.Result, "0x%x", &latestBlock)
+	fmt.Sscanf(blockNumberStr, "0x%x", &latestBlock)
 
 	currentBlock := s.store.GetCurrentBlock()
 	if currentBlock == 0 {
-		// If starting fresh, begin 10 blocks back
 		currentBlock = latestBlock - 10
 	}
 
-	// Process each block from current to latest
 	for blockNum := currentBlock + 1; blockNum <= latestBlock; blockNum++ {
 		blockResponse, err := s.client.MakeRPCCall("eth_getBlockByNumber",
 			[]interface{}{fmt.Sprintf("0x%x", blockNum), true})
@@ -74,7 +76,18 @@ func (s *Service) ParseBlocks() error {
 			return fmt.Errorf("failed to get block %d: %v", blockNum, err)
 		}
 
-		if err := s.processBlock(blockNum, blockResponse.Result); err != nil {
+		blockData, ok := blockResponse.Result.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("invalid block data format")
+		}
+
+		// Convert the map to JSON string
+		blockDataBytes, err := json.Marshal(blockData)
+		if err != nil {
+			return fmt.Errorf("error marshaling block data: %v", err)
+		}
+
+		if err := s.processBlock(blockNum, string(blockDataBytes)); err != nil {
 			return fmt.Errorf("error processing block %d: %v", blockNum, err)
 		}
 
@@ -86,13 +99,20 @@ func (s *Service) ParseBlocks() error {
 
 // processBlock handles the individual block data, extracting and storing relevant transactions.
 func (s *Service) processBlock(blockNum int, blockData string) error {
-	var block Block
+	var block struct {
+		Transactions []struct {
+			Hash  string `json:"hash"`
+			From  string `json:"from"`
+			To    string `json:"to"`
+			Value string `json:"value"`
+		} `json:"transactions"`
+	}
+
 	if err := json.Unmarshal([]byte(blockData), &block); err != nil {
 		return fmt.Errorf("error unmarshaling block: %v", err)
 	}
 
 	for _, tx := range block.Transactions {
-		// Only process transactions involving subscribed addresses
 		if s.store.IsSubscribed(tx.From) || s.store.IsSubscribed(tx.To) {
 			transaction := entity.Transaction{
 				Hash:        tx.Hash,

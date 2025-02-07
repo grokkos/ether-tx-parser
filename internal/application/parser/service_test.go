@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/grokkos/ether-tx-parser/internal/domain/entity"
 	"github.com/grokkos/ether-tx-parser/pkg/ethereum"
@@ -73,8 +74,13 @@ func (m *MockEthereumClient) MakeRPCCall(method string, params []interface{}) (*
 	if method == "eth_getBlockByNumber" {
 		blockNum := params[0].(string)
 		if response, ok := m.blockResponses[blockNum]; ok {
+			// Parse the JSON string into a map[string]interface{}
+			var result map[string]interface{}
+			if err := json.Unmarshal([]byte(response), &result); err != nil {
+				return nil, fmt.Errorf("error parsing mock response: %v", err)
+			}
 			return &ethereum.JSONRPCResponse{
-				Result: response,
+				Result: result,
 			}, nil
 		}
 	}
