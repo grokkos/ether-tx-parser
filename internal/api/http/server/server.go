@@ -22,7 +22,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) SetupRoutes() {
-	http.HandleFunc("/block", s.handler.GetCurrentBlock)
-	http.HandleFunc("/subscribe", s.handler.Subscribe)
-	http.HandleFunc("/transactions", s.handler.GetTransactions)
+	s.mux.HandleFunc("/block", s.handler.GetCurrentBlock)
+	s.mux.HandleFunc("/subscribe", s.handler.Subscribe)
+	s.mux.HandleFunc("/transactions", s.handler.GetTransactions)
 }
