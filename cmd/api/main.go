@@ -32,11 +32,25 @@ func main() {
 
 	// Initialize dependencies
 	client := ethereum.NewClient(cfg.Ethereum.RPCURL)
+	if client == nil {
+		log.Fatal("Failed to initialize Ethereum client")
+	}
+	
 	store := storage.NewMemoryStore()
+	if store == nil {
+		log.Fatal("Failed to initialize storage")
+	}
+
 	service := parser.NewService(store, client)
+	if service == nil {
+		log.Fatal("Failed to initialize parser service")
+	}
 
 	// Setup HTTP server
 	parserHandler := handler.NewParserHandler(service)
+	if parserHandler == nil {
+		log.Fatal("Failed to initialize parser handler")
+	}
 	srv := server.NewServer(parserHandler)
 	srv.SetupRoutes()
 

@@ -2,6 +2,7 @@ package storage
 
 import (
 	"github.com/grokkos/ether-tx-parser/internal/domain/entity"
+	"go.uber.org/zap"
 	"sync"
 )
 
@@ -9,13 +10,15 @@ type MemoryStore struct {
 	currentBlock int
 	subscribers  map[string]bool
 	transactions map[string][]entity.Transaction
-	mutex        sync.RWMutex
+	mutex        *sync.RWMutex
+	logger       *zap.Logger
 }
 
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
 		subscribers:  make(map[string]bool),
 		transactions: make(map[string][]entity.Transaction),
+		mutex:        &sync.RWMutex{}, // Make sure mutex is initialized
 	}
 }
 
@@ -45,9 +48,18 @@ func (s *MemoryStore) IsSubscribed(address string) bool {
 }
 
 func (s *MemoryStore) GetTransactions(address string) []entity.Transaction {
+	if s == nil {
+		return []entity.Transaction{}
+	}
+
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	return s.transactions[address]
+
+	// Return empty slice instead of nil if no transactions
+	if transactions, exists := s.transactions[address]; exists {
+		return transactions
+	}
+	return []entity.Transaction{}
 }
 
 func (s *MemoryStore) AddTransaction(tx entity.Transaction) {
