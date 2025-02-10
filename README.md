@@ -186,7 +186,6 @@ For testing purposes, you can use these active Ethereum addresses:
     - Verify all required files are in the correct locations
 
 2. **If the service isn't finding transactions:**
-    - Verify the address is subscribed using the debug endpoint
     - Check the logs for any RPC errors
     - Ensure the Ethereum node URL is accessible
 
