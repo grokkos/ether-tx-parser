@@ -29,7 +29,6 @@ func (h *ParserHandler) GetCurrentBlock(w http.ResponseWriter, r *http.Request) 
 func (h *ParserHandler) Subscribe(w http.ResponseWriter, r *http.Request) {
 	var req SubscribeRequest
 
-	// Check if method is POST
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return

@@ -7,7 +7,7 @@ import (
 
 type Server struct {
 	handler *handler.ParserHandler
-	mux     *http.ServeMux // Add this
+	mux     *http.ServeMux
 }
 
 func NewServer(handler *handler.ParserHandler) *Server {
