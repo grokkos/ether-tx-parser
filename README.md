@@ -2,7 +2,14 @@
 
 [![Docker](https://img.shields.io/badge/Docker-Supported-blue)](https://www.docker.com/)
 
-A service that monitors the Ethereum blockchain for transactions and provides notifications for subscribed addresses. This service allows users to subscribe to Ethereum addresses and query their transactions through a simple HTTP API.
+A service that monitors the Ethereum blockchain and allows users to track transactions for specific addresses. Users can subscribe to Ethereum addresses and query their transactions through a simple HTTP API. The service continuously parses new blocks and stores transactions involving subscribed addresses in memory for later retrieval.
+
+## ✨ Key Features
+
+- Subscribe to specific Ethereum addresses for monitoring
+- Parse new Ethereum blocks in real-time
+- Query transactions for subscribed addresses
+- In-memory storage of relevant transactions
 
 ## 📖 Table of Contents
 - [Architecture](#architecture)
