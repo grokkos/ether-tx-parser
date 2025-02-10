@@ -35,9 +35,9 @@ eth-tx-parser/
 │   ├── domain/          # Core business logic and interfaces
 │   ├── infrastructure/  # External implementations (Ethereum client, storage)
 │   ├── application/     # Use cases and business rules
-│   └── delivery/        # HTTP delivery mechanism
+│   └── api/             # HTTP api 
 ├── pkg/                 # Shared packages
-└── test/               # Integration tests
+└── test/                # Integration tests
 ```
 
 ### 🔑 Key Design Decisions
